@@ -1,10 +1,20 @@
 const form = document.getElementById('chat-form');
 const input = document.getElementById('user-input');
 const chatBox = document.getElementById('chat-box');
-const submitButton = form.querySelector('button[type="submit"]');
+const submitButton = document.getElementById('send-button');
+const welcomeGreeting = document.getElementById('welcome-greeting');
 
-// Maintain conversation history to send multi-turn context to Gemini
+// Multi-turn conversation history
 const conversation = [];
+
+// Quick suggestion chips handler
+document.querySelectorAll('.chip-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const promptText = btn.getAttribute('data-prompt') || btn.textContent.trim();
+    input.value = promptText;
+    form.dispatchEvent(new Event('submit', { cancelable: true }));
+  });
+});
 
 form.addEventListener('submit', async function (e) {
   e.preventDefault();
@@ -12,22 +22,28 @@ form.addEventListener('submit', async function (e) {
   const userMessage = input.value.trim();
   if (!userMessage) return;
 
-  // 1. Display user message in chat box
+  // Sembunyikan welcome card saat pesan pertama dikirim
+  if (welcomeGreeting) {
+    welcomeGreeting.style.display = 'none';
+  }
+
+  // 1. Tampilkan pesan user di chat box & reset input
   appendMessage('user', userMessage);
   input.value = '';
 
-  // 2. Add user message to conversation history
+  // 2. Simpan pesan user ke conversation history
   conversation.push({ role: 'user', text: userMessage });
 
-  // 3. Display temporary "Thinking..." message
-  const thinkingMessage = appendMessage('bot', 'Thinking...');
+  // 3. Tampilkan pesan temporary "Thinking..." dengan animasi loading
+  const thinkingMessage = appendMessage('bot', 'Celeste sedang mengetik...');
+  thinkingMessage.classList.add('thinking');
 
-  // Disable form controls while waiting for response
+  // Disable kontrol selama proses berlangsung
   input.disabled = true;
   if (submitButton) submitButton.disabled = true;
 
   try {
-    // 4. Send conversation payload to /api/chat
+    // 4. Kirim request POST ke backend /api/chat
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: {
@@ -42,20 +58,23 @@ form.addEventListener('submit', async function (e) {
 
     const data = await response.json();
 
-    // 5. Replace "Thinking..." with AI reply or fallback message
+    // 5. Ganti pesan "Thinking..." dengan balasan AI
+    thinkingMessage.classList.remove('thinking');
+
     if (data && data.result) {
       thinkingMessage.textContent = data.result;
       conversation.push({ role: 'model', text: data.result });
     } else {
-      thinkingMessage.textContent = 'Sorry, no response received.';
-      conversation.pop(); // Revert user message from history on invalid response
+      thinkingMessage.textContent = 'Maaf, tidak ada respon yang diterima.';
+      conversation.pop(); // Batalkan pesan user terakhir jika respon gagal
     }
   } catch (error) {
     console.error('Chat error:', error);
-    thinkingMessage.textContent = 'Failed to get response from server.';
-    conversation.pop(); // Revert user message from history on request failure
+    thinkingMessage.classList.remove('thinking');
+    thinkingMessage.textContent = 'Gagal terhubung ke server. Silakan coba lagi.';
+    conversation.pop(); // Batalkan pesan user terakhir dari context
   } finally {
-    // Re-enable form controls and scroll chat to bottom
+    // Aktifkan kembali kontrol input
     input.disabled = false;
     if (submitButton) submitButton.disabled = false;
     input.focus();
@@ -64,17 +83,15 @@ form.addEventListener('submit', async function (e) {
 });
 
 /**
- * Appends a chat bubble to the chat box.
- * @param {'user' | 'bot'} sender - The sender type.
- * @param {string} text - Message content.
- * @returns {HTMLDivElement} The created message element.
+ * Menambahkan bubble pesan ke dalam chat box
+ * @param {'user' | 'bot'} sender
+ * @param {string} text
+ * @returns {HTMLDivElement}
  */
 function appendMessage(sender, text) {
   const msg = document.createElement('div');
   msg.classList.add('message', sender);
   msg.textContent = text;
-  msg.style.clear = 'both';
-  msg.style.whiteSpace = 'pre-wrap';
 
   chatBox.appendChild(msg);
   chatBox.scrollTop = chatBox.scrollHeight;

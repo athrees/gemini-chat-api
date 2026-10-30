@@ -1,20 +1,79 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Gemini AI Chatbot</title>
+  <title>Celeste AI - Layanan Tamu & Reservasi Hotel</title>
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-  <div class="container">
-    <h1>Gemini AI Chatbot</h1>
-    <div id="chat-box" class="chat-box"></div>
-    <form id="chat-form">
-      <input type="text" id="user-input" placeholder="Type your message..." autocomplete="off" required />
-      <button type="submit">Send</button>
-    </form>
+  <div class="chat-container">
+    <!-- Header -->
+    <header class="chat-header">
+      <div class="bot-profile">
+        <div class="avatar-wrapper">
+          <div class="avatar">🛎️</div>
+          <span class="status-dot"></span>
+        </div>
+        <div class="bot-info">
+          <h1 class="bot-name">Celeste AI</h1>
+          <p class="bot-status">Layanan Tamu & Reservasi • Online</p>
+        </div>
+      </div>
+      <span class="model-badge">Gemini 3.5</span>
+    </header>
+
+    <!-- Chat Box -->
+    <main id="chat-box" class="chat-box">
+      <!-- Welcome Message & Suggestion Chips -->
+      <div id="welcome-greeting" class="welcome-box">
+        <div class="welcome-icon">🏨</div>
+        <h2 class="welcome-title">Selamat Datang di Hotel Kami</h2>
+        <p class="welcome-subtitle">
+          Halo! Saya Celeste, asisten layanan tamu hotel bintang 5. Saya siap membantu Anda melakukan reservasi kamar, cek ketersediaan, serta informasi fasilitas hotel.
+        </p>
+
+        <div class="suggestion-chips">
+          <button type="button" class="chip-btn" data-prompt="Apa saja tipe kamar dan fasilitas unggulan yang tersedia?">
+            🛏️ Informasi tipe kamar & fasilitas
+          </button>
+          <button type="button" class="chip-btn" data-prompt="Saya ingin melakukan reservasi kamar untuk akhir pekan ini">
+            📅 Booking & reservasi kamar
+          </button>
+          <button type="button" class="chip-btn" data-prompt="Berapa jam operasional restoran, kolam renang, dan spa hotel?">
+            🍽️ Jam operasional fasilitas & resto
+          </button>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer Input -->
+    <footer class="chat-footer">
+      <form id="chat-form">
+        <div class="input-container">
+          <input 
+            type="text" 
+            id="user-input" 
+            placeholder="Tulis destinasi impian atau pertanyaanmu..." 
+            autocomplete="off" 
+            required 
+          />
+          <button type="submit" id="send-button" aria-label="Kirim Pesan">
+            <svg class="send-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="22" y1="2" x2="11" y2="13"></line>
+              <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+            </svg>
+          </button>
+        </div>
+      </form>
+      <p class="disclaimer">Ditenagai oleh Google Gemini API. Rekomendasi dibuat secara otomatis.</p>
+    </footer>
   </div>
+
   <script src="script.js"></script>
 </body>
 </html>
